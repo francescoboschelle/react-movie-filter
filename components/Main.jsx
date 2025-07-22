@@ -3,23 +3,40 @@ import movies from "../data/data";
 
 export default function Main() {
   const [filter, setFilter] = useState("All");
-  const [data, setData] = useState([movies]);
+  const [fullData, setFullData] = useState(movies); // Data completo
+  const [data, setData] = useState(movies); // Data visibile in pagine
   const [query, setQuery] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newGenre, setNewGenre] = useState("");
 
   useEffect(() => {
     let newData;
     if (filter === "All") {
-      newData = movies;
+      newData = fullData;
     } else {
-      newData = movies.filter((movie) => movie.genre === filter);
+      newData = fullData.filter((movie) => movie.genre === filter);
     }
 
     if (query !== "") {
-      newData = newData.filter((movie) => movie.title.startsWith(query));
+      newData = fullData.filter((movie) => movie.title.startsWith(query));
     }
 
     setData(newData);
-  }, [filter, query]);
+  }, [filter, query, fullData]);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!newName || !newGenre) {
+      alert("Devi inserire tutti i dati!");
+      return;
+    }
+
+    const newMovie = { title: newName, genre: newGenre };
+
+    setData([...data, newMovie]);
+    setFullData([...fullData, newMovie]);
+  }
 
   return (
     <main>
@@ -27,6 +44,42 @@ export default function Main() {
         <div className="card">
           <div className="card-body">
             <h1 className="card-title text-center">Lista film</h1>
+            <hr />
+
+            <div className="container">
+              <form onSubmit={handleSubmit}>
+                <h3 className="text-center mb-3">Inserisci film</h3>
+                <div className="mb-3 row">
+                  <div className="col-6">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="inputName"
+                      id="inputName"
+                      placeholder="Nome"
+                      onChange={(e) => setNewName(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-6">
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="inputGenre"
+                      id="inputGenre"
+                      placeholder="Genere"
+                      onChange={(e) => setNewGenre(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="mb-3 row justify-content-center">
+                  <div className="text-center">
+                    <button type="submit" className="btn btn-primary">
+                      Inserisci
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
             <hr />
 
             <div className="d-flex gap-3">
@@ -49,7 +102,7 @@ export default function Main() {
                   >
                     Filter by Genres
                   </p>
-                  {movies.map((movie, index) => {
+                  {fullData.map((movie, index) => {
                     return (
                       <p
                         className="dropdown-item"
@@ -63,10 +116,10 @@ export default function Main() {
                 </div>
               </div>
 
-              <div class="mb-3">
+              <div className="mb-3">
                 <input
                   type="text"
-                  class="form-control"
+                  className="form-control"
                   name=""
                   id=""
                   aria-describedby="helpId"
